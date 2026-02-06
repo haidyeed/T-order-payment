@@ -7,7 +7,7 @@ use App\Models\Product;
 class OrderService
 {
 
-    public function calculateTotal($orderId,$orderItems)
+    public function calculateTotal($orderId = null, $orderItems = null)
     {
         $total = 0;
 
