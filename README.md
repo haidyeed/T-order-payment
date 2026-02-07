@@ -1,59 +1,440 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## commands to run the App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+- Clone the App
+git clone https://github.com/haidyeed/T-order-payment.git
 
-## About Laravel
+cd T-order-payment
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+(if needed run ..)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+cp .env.example .env
+composer install
+php artisan key:generate
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Database setup & commands 
+CREATE DATABASE t-order-payment
 
-## Learning Laravel
+php artisan migrate
+php artisan db:seed
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- .env setup for DB and Payment keys
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=t-order-payment
+DB_USERNAME=root
+DB_PASSWORD=
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+CREDITCARD_URL="CREDITCARD_URL"
+CREDITCARD_KEY="CREDITCARD_KEY"
+CREDITCARD_SECRET="CREDITCARD_SECRET"
+CREDITCARD_MERCHANTID="CREDITCARD_MERCHANTID"
 
-## Laravel Sponsors
+PAYPAL_URL="PAYMOB_URL"
+PAYPAL_CLIENT_ID="PAYMOB_CLIENT_ID"
+PAYPAL_CLIENT_SECRET="PAYMOB_CLIENT_SECRET"
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## logs viewer url 
+(rap2hpoutre package)
+http://127.0.0.1:8000/logs
 
-### Premium Partners
+## APIs viewer url 
+(Rakutentech package)
+http://127.0.0.1:8000/request-docs
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## run on ..
+http://0.0.0.0:8000
 
-## Contributing
+## Authentication (using passport)
+any user password is 12345678    #via seeder or you may register yourself.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+📁 Project Structure (only changed files or folders)
+T-order-payment/
+├── app
+│    └── Http
+│      └── Controllers    #for CRUD methods
+│      └── Requests       #for validation
+│    └── Models 
+│    └── Services
+│      └── payments       #for payment strategy
+│      └── orderService.php  #for order calculations
+├── config
+│   └── logging.php
+│   └── payment.php
+│   └── request-docs
+├── database
+│   └── factories
+│   └── migrations
+│   └── seeders
+├── routes
+│   └── api.php
+│   └── web.php
+├── storage
+│   └── logs
+│     └── payment
+├── tests
+├── .env.example
+└── README.md
 
-## Code of Conduct
+# Api Doc
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Auth
+### Register
+- METHOD: POST
+- URL: http://127.0.0.1:8000/api/register
+- BODY: {
+            "email":"test@mail.com",
+            "password":"11111111",
+            "password_confirmation":"11111111",
+            "name":"test test"
+        }
+- SUCCESS RESPONSE: {
+                "success": "Account successfully registered.",
+                "user": {
+                    "name": "test test",
+                    "email": "test@mail.com",
+                    "updated_at": "2026-02-07T17:22:22.000000Z",
+                    "created_at": "2026-02-07T17:22:22.000000Z",
+                    "id": 1102
+                }
+            }
+- ERROR RESPONSE: {
+                        "errors": "Unprocessable Entity",
+                        "message": {
+                            "email": [
+                                "The email has already been taken."
+                            ]
+                        }
+                    }
+## Login
+- METHOD: POST
+- URL: http://127.0.0.1:8000/api/login   
+- BODY: {
+            "name":"test@mail.com",
+            "password":"11111111"
+        }
+- SUCCESS RESPONSE: {
+                        "success": {
+                            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9......."
+                        },
+                        "user": {
+                            "id": 1,
+                            "name": "test test",
+                            "email": "test@mail.com",
+                            "email_verified_at": "2026-02-06T16:20:17.000000Z",
+                            "created_at": "2026-02-06T05:19:04.000000Z",
+                            "updated_at": "2026-02-06T05:19:04.000000Z"
+                        }
+                    }
+- ERROR RESPONSE: {
+                    "errors": "unauthorized",
+                    "message": "These credentials do not match our records."
+                  }
 
-## Security Vulnerabilities
+## Product
+### list all products (paginated)
+- METHOD: GET
+- URL: http://127.0.0.1:8000/api/products    
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- RESPONSE: {
+    "success": true,
+    "data": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 135,
+                "name": "Enim 7646",
+                "sku": "BN-539",
+                "price": 86092,
+                "status": 1,
+                "order": 31,
+                "created_at": "2026-02-06T16:31:40.000000Z",
+                "updated_at": "2026-02-06T16:31:40.000000Z"
+            },
+            {
+                "id": 134,
+                "name": "Facere 3293",
+                "sku": "EY-147",
+                "price": 152603,
+                "status": 1,
+                "order": 63,
+                "created_at": "2026-02-06T16:31:40.000000Z",
+                "updated_at": "2026-02-06T16:31:40.000000Z"
+            },
+            {
+                "id": 133,
+                "name": "Quasi 7264",
+                "sku": "MX-690",
+                "price": 543665,
+                "status": 1,
+                "order": 65,
+                "created_at": "2026-02-06T16:31:40.000000Z",
+                "updated_at": "2026-02-06T16:31:40.000000Z"
+            },
+            ......
+        ],
+        "first_page_url": "http://127.0.0.1:8000/api/products?productpage=1",
+        "from": 1,
+        "last_page": 3,
+        "last_page_url": "http://127.0.0.1:8000/api/products?productpage=3",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "page": null,
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/products?productpage=1",
+                "label": "1",
+                "page": 1,
+                "active": true
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/products?productpage=2",
+                "label": "2",
+                "page": 2,
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/products?productpage=3",
+                "label": "3",
+                "page": 3,
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/products?productpage=2",
+                "label": "Next &raquo;",
+                "page": 2,
+                "active": false
+            }
+        ],
+        "next_page_url": "http://127.0.0.1:8000/api/products?productpage=2",
+        "path": "http://127.0.0.1:8000/api/products",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 10,
+        "total": 29
+    }
+}
+### create product
+- METHOD: POST
+- URL: http://127.0.0.1:8000/api/products
+- AUTHORIZATION: Bearer Token
+- BODY: {
+        "name": "Smartphone",
+        "sku": "SP001",
+        "price": 800,
+        "order": 1,
+        "status": 1
+      }
+- SUCCESS RESPONSE: {
+                        "success": "Product successfully created.",
+                        "product": {
+                            "name": "Smartphone",
+                            "sku": "SP001",
+                            "price": 800,
+                            "order": 1,
+                            "status": 1,
+                            "updated_at": "2026-02-07T17:43:55.000000Z",
+                            "created_at": "2026-02-07T17:43:55.000000Z",
+                            "id": 138
+                        }
+                    }
+- ERROR RESPONSE: {
+                    "message": "The sku has already been taken.",
+                    "errors": {
+                        "sku": [
+                            "The sku has already been taken."
+                        ]
+                    }
+                  }
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## order
+### create order
+- METHOD: POST
+- URL: http://127.0.0.1:8000/api/orders
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- SUCCESS ESPONSE: {
+    "success": true,
+    "order": {
+        "user_id": 1,
+        "total": 200.00,
+        "status": "pending",
+        "updated_at": "2026-02-07T15:55:03.000000Z",
+        "created_at": "2026-02-07T15:55:03.000000Z",
+        "id": 11,
+        "products": [
+            {
+                "id": 1,
+                "name": "sed",
+                "sku": "BA-505",
+                "price": 50,
+                "status": 1,
+                "order": 67,
+                "created_at": "2026-02-06T16:20:47.000000Z",
+                "updated_at": "2026-02-06T16:20:47.000000Z",
+                "pivot": {
+                    "order_id": 11,
+                    "product_id": 1,
+                    "quantity": 2,
+                    "price": 50
+                }
+            },
+            {
+                "id": 3,
+                "name": "Smartphone",
+                "sku": "SP001",
+                "price": 100,
+                "status": 1,
+                "order": 1,
+                "created_at": "2026-02-06T15:51:55.000000Z",
+                "updated_at": "2026-02-06T15:51:55.000000Z",
+                "pivot": {
+                    "order_id": 11,
+                    "product_id": 3,
+                    "quantity": 1,
+                    "price": 100
+                }
+            }
+        ]
+    },
+    "message": "Order created successfully"
+}
+- ERROR RESPONSE: {
+                    "message": "The selected orderItems.0.product_id is invalid.",
+                    "errors": {
+                        "orderItems.0.product_id": [
+                            "The selected orderItems.0.product_id is invalid."
+                        ]
+                    }
+                  }
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### list all orders
+- METHOD: GET
+- URL: http://127.0.0.1:8000/api/orders   
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- Response: **same as listing products but for orders listing**
+
+### show order details
+- METHOD: GET
+- URL: http://127.0.0.1:8000/api/order/5   
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- SUCCESS Response: {
+        "success": true,
+        "order": {
+                "id": 11,
+                "user_id": 1,
+                "total": "1650.00",
+                "status": "confirmed",
+                "created_at": "2026-02-07T15:55:03.000000Z",
+                "updated_at": "2026-02-07T15:55:27.000000Z",
+                "products": [
+                    {
+                        "id": 3,
+                        "name": "sed",
+                        "sku": "BA-505",
+                        "price": 50,
+                        "status": 1,
+                        "order": 67,
+                        "created_at": "2026-02-06T16:20:47.000000Z",
+                        "updated_at": "2026-02-06T16:20:47.000000Z",
+                        "pivot": {
+                            "order_id": 11,
+                            "product_id": 3,
+                            "quantity": 1,
+                            "price": 50
+                        }
+                    },
+                    {
+                        "id": 1,
+                        "name": "Smartphone",
+                        "sku": "SP001",
+                        "price": 800,
+                        "status": 1,
+                        "order": 1,
+                        "created_at": "2026-02-06T15:51:55.000000Z",
+                        "updated_at": "2026-02-06T15:51:55.000000Z",
+                        "pivot": {
+                            "order_id": 11,
+                            "product_id": 1,
+                            "quantity": 2,
+                            "price": 800
+                        }
+                    }
+                ]
+            }
+        }
+- ERROR RESPONSE: {
+                    "success": false,
+                    "message": "Order not found"
+                  }  
+
+### change order status
+- METHOD: GET
+- URL: http://127.0.0.1:8000/api/order/changeStatus/11/confirmed  
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- SUCCESS Response: {
+    "success": true,
+    "order": {
+        "id": 11,
+        "user_id": 1,
+        "total": "1650.00",
+        "status": "confirmed",
+        "created_at": "2026-02-07T15:55:03.000000Z",
+        "updated_at": "2026-02-07T15:55:27.000000Z"
+    },
+    "message": "Order status updated successfully"
+}
+- ERROR RESPONSE: {
+    "success": false,
+    "message": "Order not found"
+}
+
+### delete order
+- METHOD: DELETE
+- URL: http://127.0.0.1:8000/api/orders/6 
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- SUCCESS Response: {
+    "success": true,
+    "message": "order deleted successfully"
+}
+- ERROR RESPONSE: {
+    "success": false,
+    "message": "Cannot delete order with payments."
+}
+
+## payment
+### process payment
+- METHOD: POST
+- URL: http://127.0.0.1:8000/api/payments/orders/11 
+- AUTHORIZATION: Bearer Token
+- BODY: {
+  "method": "credit_card"
+}
+- SUCCESS Response: {
+    "order_id": 11,
+    "status": "successful",
+    "method": "credit_card",
+    "transaction_id": "CreditCard-698760eab7a2a",
+    "updated_at": "2026-02-07T15:57:30.000000Z",
+    "created_at": "2026-02-07T15:57:30.000000Z",
+    "id": 13
+}
+- ERROR RESPONSE: {
+    "error": "this Order does not exist"
+}
+
+### list all payment
+- METHOD: GET
+- URL: http://127.0.0.1:8000/api/payments
+- AUTHORIZATION: Bearer Token
+- BODY: 
+- Response: **same as listing products but for payments listing**
