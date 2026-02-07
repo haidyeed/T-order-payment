@@ -44,16 +44,24 @@ class PaymentController extends Controller
         if (!$gateway) { 
             return response()->json(['error' => 'Unsupported payment method'], 400); 
         } 
+
+        $paymentData = [
+            'order_Info' => $order,
+            'payment_gateway_Info' => $request->all(),
+            'order_user_Info' => $order->user,
+            'auth_user_Info' => auth()->user()
+        ];
         
+        // return response()->json(['error' => $paymentData], 404); 
+
         $paymentService = new PaymentService($gateway); 
         
-        $result = $paymentService->process($request->all()); 
-        $payment = Payment::create([ 'order_id' => $order->id, 'status' => $result['status'], 'method' => $method, 'transaction_id' => $result['transaction_id'] ]); 
+        $result = $paymentService->process($paymentData); 
+        $payment = Payment::create([ 'order_id' => $order->id, 'status' => $result['transactionStatus'], 'method' => $method, 'transaction_id' => $result['transaction_id'] ]); 
 
         return response()->json($payment, 201); 
-        
-    }
 
+    }
 
 
     public function viewPayments($orderId = null) { 

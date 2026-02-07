@@ -127,6 +127,15 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        // log channel for payment process
+        'payment' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/payment/payment.log'),
+            'level' => 'debug',
+            'permission' => 0775,
+            'days' => 2,
+        ],
+
     ],
 
 ];
