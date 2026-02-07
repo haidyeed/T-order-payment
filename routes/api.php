@@ -24,7 +24,7 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::get('/order/{id}', [OrderController::class, 'viewOrderDetails'])->name('view.order');
     Route::post('/orders', [OrderController::class, 'createOrder'])->name('create.order');
     Route::get('/order/changeStatus/{id}/{status}', [OrderController::class, 'changeOrderStatus'])->name('change-order-status');
-
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('delete.order');
 
     //Payment routes
     Route::post('/payments/orders/{id}', [PaymentController::class, 'processPayment'])->name('process.payment'); 

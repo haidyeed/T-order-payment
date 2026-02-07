@@ -100,4 +100,32 @@ class OrderController extends Controller
 
     }
 
+    
+    /**
+     * delete the specified resource
+     * @param  int  $id
+     */
+    public function destroy($id)
+    {
+        try{
+            
+            $order = Order::findOrFail($id);
+            $order->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'order deleted successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+
+        }
+
+    }
+
 }
