@@ -1,23 +1,23 @@
 ## commands to run the App
 
-- Clone the App
-git clone https://github.com/haidyeed/T-order-payment.git
+### Clone the App
+- git clone https://github.com/haidyeed/T-order-payment.git
 
-cd T-order-payment
+- cd T-order-payment
 
 (if needed run ..)
 
-cp .env.example .env
-composer install
-php artisan key:generate
+- cp .env.example .env
+- composer install
+- php artisan key:generate
 
-- Database setup & commands 
-CREATE DATABASE t-order-payment
+### Database setup & commands 
+- CREATE DATABASE t-order-payment
 
-php artisan migrate
-php artisan db:seed
+- php artisan migrate
+- php artisan db:seed
 
-- .env setup for DB and Payment keys
+### .env setup for DB and Payment keys
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -46,7 +46,7 @@ http://127.0.0.1:8000/request-docs
 http://0.0.0.0:8000
 
 ## Authentication (using passport)
-any user password is 12345678    #via seeder or you may register yourself.
+**any user password is 12345678    #via seeder or you may register yourself.**
 
 📁 Project Structure (only changed files or folders)
 T-order-payment/
@@ -76,9 +76,9 @@ T-order-payment/
 ├── .env.example
 └── README.md
 
-# Api Doc
+# Api Doc.
 
-## Auth
+## Auth.
 ### Register
 - METHOD: POST
 - URL: http://127.0.0.1:8000/api/register
@@ -311,15 +311,12 @@ T-order-payment/
                         ]
                     }
                   }
-
-
 ### list all orders
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/orders   
 - AUTHORIZATION: Bearer Token
 - BODY: 
 - Response: **same as listing products but for orders listing**
-
 ### show order details
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/order/5   
@@ -374,7 +371,6 @@ T-order-payment/
                     "success": false,
                     "message": "Order not found"
                   }  
-
 ### change order status
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/order/changeStatus/11/confirmed  
@@ -396,7 +392,6 @@ T-order-payment/
     "success": false,
     "message": "Order not found"
 }
-
 ### delete order
 - METHOD: DELETE
 - URL: http://127.0.0.1:8000/api/orders/6 
@@ -431,7 +426,6 @@ T-order-payment/
 - ERROR RESPONSE: {
     "error": "this Order does not exist"
 }
-
 ### list all payment
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/payments
