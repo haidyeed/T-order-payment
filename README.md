@@ -46,7 +46,7 @@ http://127.0.0.1:8000/request-docs
 http://0.0.0.0:8000
 
 ## Authentication (using passport)
-**any user password is 12345678    #via seeder or you may register yourself.**
+**any user password is 12345678    via seeder or you may register yourself.**
 
 📁 Project Structure (only changed files or folders)
 T-order-payment/
