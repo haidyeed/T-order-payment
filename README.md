@@ -311,15 +311,12 @@ T-order-payment/
                         ]
                     }
                   }
-
-
 ### list all orders
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/orders   
 - AUTHORIZATION: Bearer Token
 - BODY: 
 - Response: **same as listing products but for orders listing**
-
 ### show order details
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/order/5   
@@ -374,7 +371,6 @@ T-order-payment/
                     "success": false,
                     "message": "Order not found"
                   }  
-
 ### change order status
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/order/changeStatus/11/confirmed  
@@ -396,7 +392,6 @@ T-order-payment/
     "success": false,
     "message": "Order not found"
 }
-
 ### delete order
 - METHOD: DELETE
 - URL: http://127.0.0.1:8000/api/orders/6 
@@ -431,7 +426,6 @@ T-order-payment/
 - ERROR RESPONSE: {
     "error": "this Order does not exist"
 }
-
 ### list all payment
 - METHOD: GET
 - URL: http://127.0.0.1:8000/api/payments
