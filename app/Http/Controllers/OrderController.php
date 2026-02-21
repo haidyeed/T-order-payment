@@ -8,7 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Orders_products;
 use App\Services\OrderService;
-
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -32,21 +32,25 @@ class OrderController extends Controller
      */
     public function changeOrderStatus($id, $status)
     {
+        try {
         $order = Order::find($id);
 
-        if (!$order) { 
-            return response()->json([ 'success' => false, 'message' => 'Order not found' ], 404); 
+            if (!$order) { 
+                return response()->json([ 'success' => false, 'message' => 'Order not found' ], 404); 
+            }
+
+            $validator = \Validator::make( ['status' => $status], ['status' => 'required|string|in:confirmed,pending,cancelled'] ); 
+            
+            if ($validator->fails()) { 
+                return response()->json([ 'success' => false, 'errors' => $validator->errors() ], 422); 
+            }
+
+            $order->update(['status' => $status]);
+            return response()->json([ 'success' => true, 'order' => $order, 'message' => 'Order status updated successfully' ], 200);
+
+        } catch (\Exception $e) { 
+            return response()->json([ 'success' => false, 'message' => 'Failed to update order status', 'error' => $e->getMessage() ], 500); 
         }
-
-        $validator = \Validator::make( ['status' => $status], ['status' => 'required|string|in:confirmed,pending,cancelled'] ); 
-        
-        if ($validator->fails()) { 
-            return response()->json([ 'success' => false, 'errors' => $validator->errors() ], 422); 
-        }
-
-        $order->update(['status' => $status]);
-        return response()->json([ 'success' => true, 'order' => $order, 'message' => 'Order status updated successfully' ], 200);
-
     }
 
 
@@ -57,13 +61,17 @@ class OrderController extends Controller
      */
     public function viewOrderDetails($id)
     {
-        $order = Order::with('products')->find($id);
+        try {
+            $order = Order::with('products')->find($id);
 
-        if (!$order) { 
-            return response()->json([ 'success' => false, 'message' => 'Order not found' ], 404); 
-        }
+            if (!$order) { 
+                return response()->json([ 'success' => false, 'message' => 'Order not found' ], 404); 
+            }
 
-        return response()->json([ 'success' => true, 'order' => $order ], 200);     
+            return response()->json([ 'success' => true, 'order' => $order ], 200); 
+        } catch (\Exception $e) { 
+            return response()->json([ 'success' => false, 'message' => 'Failed to retrieve order details', 'error' => $e->getMessage() ], 500); 
+        }    
     }
 
 
@@ -74,29 +82,39 @@ class OrderController extends Controller
             return response()->json([ 'success' => false, 'message' => 'Order not created there is no order items yet' ], 400);
         }
 
-        //Calculate order total
-        $orderService = new OrderService();
-        $this->total = $orderService->calculateTotal(null,$request->orderItems);
+        try { 
+            DB::beginTransaction();
 
-        // Create order 
-        $order = new Order; 
-        $order->user_id = auth()->id();
-        $order->total = $this->total;
-        $order->status = $request->status ?? 'pending';
-        $order->save();
+            //Calculate order total
+            $orderService = new OrderService();
+            $this->total = $orderService->calculateTotal(null,$request->orderItems);
 
-        // Attach products 
-        foreach ($request->orderItems as $item) { 
-            $orderProduct = new Orders_products; 
-            $orderProduct->order_id = $order->id; 
-            $orderProduct->product_id = $item['product_id']; 
-            $orderProduct->quantity = $item['quantity']; 
-            $orderProduct->price = Product::find($item['product_id'])->price; 
-            $orderProduct->save(); 
+            // Create order 
+            $order = new Order; 
+            $order->user_id = auth()->id();
+            $order->total = $this->total;
+            $order->status = $request->status ?? 'pending';
+            $order->save();
+
+            // Attach products 
+            foreach ($request->orderItems as $item) { 
+                $orderProduct = new Orders_products; 
+                $orderProduct->order_id = $order->id; 
+                $orderProduct->product_id = $item['product_id']; 
+                $orderProduct->quantity = $item['quantity']; 
+                $orderProduct->price = Product::find($item['product_id'])->price; 
+                $orderProduct->save(); 
+            }
+
+            DB::commit();
+
+            $order->load('products');
+            return response()->json([ 'success' => true, 'order' => $order, 'message' => 'Order created successfully' ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack(); 
+            return response()->json([ 'success' => false, 'message' => 'Order creation failed', 'error' => $e->getMessage() ], 500); 
         }
-
-        $order->load('products');
-        return response()->json([ 'success' => true, 'order' => $order, 'message' => 'Order created successfully' ], 201);
 
     }
 

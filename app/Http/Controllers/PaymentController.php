@@ -9,6 +9,7 @@ use App\Services\Payments\CreditCardGateway;
 use App\Services\Payments\PaypalGateway; 
 use App\Services\Payments\PaymentService; 
 use App\Http\Requests\ProcessPaymentRequest;
+use Illuminate\Support\Facades\DB;
 
 
 class PaymentController extends Controller
@@ -56,17 +57,36 @@ class PaymentController extends Controller
 
         $paymentService = new PaymentService($gateway); 
         
-        $result = $paymentService->process($paymentData); 
-        $payment = Payment::create([ 'order_id' => $order->id, 'status' => $result['transactionStatus'], 'method' => $method, 'transaction_id' => $result['transaction_id'] ]); 
+        try { 
+            DB::beginTransaction();
 
-        return response()->json($payment, 201); 
+            $result = $paymentService->process($paymentData); 
+            $payment = Payment::create([ 'order_id' => $order->id, 'status' => $result['transactionStatus'], 'method' => $method, 'transaction_id' => $result['transaction_id'] ]); 
+
+            //update order status if successful 
+            if ($result['transactionStatus'] === 'successful') { 
+                $order->update(['status' => 'paid']); 
+            }
+
+            DB::commit();
+            return response()->json($payment, 201); 
+        } catch (\Exception $e) { 
+            DB::rollBack(); 
+            return response()->json([ 'success' => false, 'message' => 'Payment processing failed', 'error' => $e->getMessage() ], 500); 
+        }
 
     }
 
 
     public function viewPayments($orderId = null) { 
-        $payments = $orderId ? Payment::where('order_id', $orderId)->get() : Payment::all(); 
-        return response()->json($payments); 
+        try {
+            
+            $payments = $orderId ? Payment::where('order_id', $orderId)->get() : Payment::all(); 
+            return response()->json($payments);
+
+        } catch (\Exception $e) { 
+            return response()->json([ 'success' => false, 'message' => 'Failed to retrieve payments', 'error' => $e->getMessage() ], 500); 
+        }
     }
 
 }
