@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Orders_products;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\SendOrderReceivedMail;
 
 class OrderController extends Controller
 {
@@ -107,6 +108,9 @@ class OrderController extends Controller
             }
 
             DB::commit();
+
+            // Dispatch job 
+            SendOrderReceivedMail::dispatch($order)->onQueue('emails');
 
             $order->load('products');
             return response()->json([ 'success' => true, 'order' => $order, 'message' => 'Order created successfully' ], 201);

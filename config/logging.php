@@ -136,6 +136,15 @@ return [
             'days' => 2,
         ],
 
+        // log channel for jobs
+        'jobs' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/jobs/jobs.log'),
+            'level' => 'debug',
+            'permission' => 0775,
+            'days' => 2,
+        ],
+
     ],
 
 ];
