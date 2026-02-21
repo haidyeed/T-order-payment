@@ -35,7 +35,6 @@ class ProductController extends Controller
         $product->order = $request->order ?? 0;
         $request->status ? $product->status = 1 : $product->status = 0;
 
-
         $product->save();
 
          return response()->json(['success' => "Product successfully created." ,'product'=>$product], 200);;
